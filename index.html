@@ -1,12 +1,18 @@
 <html>
 
+<head>
+  <link href="styles/style.css" rel="stylesheet">
+</head>
+
+<body>
+
 <div id="buttons">
   <button onclick="slide1()">1</button>
   <button onclick="slide2()">2</button>
   <button onclick="slide3()">3</button>
 </div>
 
-<div id="description">
+<div style="text-align:center;" id="description">
 
 </div>
 <!--<div id="slide1text">-->
@@ -18,7 +24,7 @@
 <!--</div>-->
 
 
-<div id="my_dataviz"></div>
+<div style="text-align:center;" id="my_dataviz"></div>
 <div id="randomizer"></div>
 <script src='https://d3js.org/d3.v5.min.js'></script>
 <script src='https://cdnjs.cloudflare.com/ajax/libs/d3-annotation/2.5.1/d3-annotation.min.js'></script>
@@ -33,8 +39,8 @@
     document.getElementById("my_dataviz").innerHTML = "";
 
     // set the dimensions and margins of the graph
-    const width = 900,
-            height = 900,
+    const width = 1200,
+            height = 1200,
             margin = 80;
 
     // The radius of the pieplot is half the width or half the height (smallest one). I subtract a bit of margin.
@@ -164,15 +170,16 @@
               const midangle = d.startAngle + (d.endAngle - d.startAngle) / 2
               return (midangle < Math.PI ? 'start' : 'end')
             })
+            .style("font-size", "20px")
 
   }
 
   function slide2() {
-    document.getElementById("description").innerHTML = "The 36% of projects that do succeed tend to be projects in\n" +
+    document.getElementById("description").innerHTML = "You may be wondering, which project categories succeed and which fail? <br> The 36% of projects that do succeed tend to be projects in " +
             "\n" +
-            "Product Design, Tabletop Games, Shorts, Music, Documentary <br>\n" +
+            "Product Design, Tabletop Games, Shorts, Music, Documentary <br>" +
             "\n" +
-            "Maybe it's time you make a new board game?"
+            "On the other hand, the projects that fail, are canceled, or are suspended tend to be projects in Product Design, Documentary, Video Games, Food, and Music"
 
     document.getElementById("my_dataviz").innerHTML = "";
 
@@ -185,9 +192,9 @@
             width = 400,
             height = 400;
 
-    var margin = {top: 300, right: 250, bottom: 250, left: 300},
-            width2 = 400,
-            height2 = 400;
+    var margin = {top: 100, right: 100, bottom: 250, left: 100},
+            width = 900 - margin.left - margin.right,
+            height = 800 - margin.left - margin.right;
 
     // append the svg object to the body of the page
     var svg = d3.select("#my_dataviz")
@@ -222,14 +229,16 @@
             .call(d3.axisBottom(x))
             .selectAll("text")
             .attr("transform", "translate(-10,0)rotate(-45)")
-            .style("text-anchor", "end");
+            .style("text-anchor", "end")
+            .style("font-size", "20px");
 
     // Add Y axis
     var y = d3.scaleLinear()
             .domain([0, 15000])
             .range([ height, 0]);
     svg.append("g")
-            .call(d3.axisLeft(y));
+            .call(d3.axisLeft(y))
+            .style("font-size", "20px");;
 
     // Bars
     svg.selectAll("mybar")
@@ -254,8 +263,8 @@
         note: { label: "Product Design is the most successful Kickstarter project category." },
         bgPadding: 20,
         color: ['red'],
-        x: 50,
-        y: 200,
+        x: 75,
+        y: 300,
         dy: -200,
         dx: 500,
         type: d3.annotationCalloutElbow,
@@ -266,10 +275,10 @@
         note: { label: "Maybe opt for a new board game idea, which can be just as successful as Product Design projects." },
         bgPadding: 20,
         color: ['red'],
-        x: 125,
-        y: 250,
+        x: 205,
+        y: 350,
         dy: -100,
-        dx: 500,
+        dx: 400,
         type: d3.annotationCalloutElbow,
         connector: { end: "arrow" },
         subject: { radius: 25, radiusPadding: 10 },
@@ -291,6 +300,10 @@
             width2 = 400,
             height2 = 400;
 
+    var margin2 = {top: 100, right: 100, bottom: 250, left: 200},
+            width2 = 900 - margin.left - margin.right,
+            height2 = 800 - margin.left - margin.right;
+
     // append the svg object to the body of the page
     var svg = d3.select("#my_dataviz")
             .append("svg")
@@ -310,14 +323,16 @@
             .call(d3.axisBottom(x2))
             .selectAll("text")
             .attr("transform", "translate(-10,0)rotate(-45)")
-            .style("text-anchor", "end");
+            .style("text-anchor", "end")
+            .style("font-size", "20px");
 
     // Add Y axis
     var y2 = d3.scaleLinear()
             .domain([0, 15000])
             .range([ height2, 0]);
     svg.append("g")
-            .call(d3.axisLeft(y2));
+            .call(d3.axisLeft(y2))
+            .style("font-size", "20px");
 
     // Bars
     svg.selectAll("mybar")
@@ -353,7 +368,7 @@
     ];
 
     const showAnnotations = d3.annotation().annotations(annotations);
-    svg.append('g').call(showAnnotations).transition().duration(1000)
+    svg.append('g').call(showAnnotations)
 
 
   }
