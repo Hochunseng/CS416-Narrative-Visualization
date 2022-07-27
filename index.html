@@ -1,0 +1,551 @@
+<html>
+
+<div id="buttons">
+  <button onclick="slide1()">1</button>
+  <button onclick="slide2()">2</button>
+  <button onclick="slide3()">3</button>
+</div>
+
+<div id="description">
+
+</div>
+<!--<div id="slide1text">-->
+<!--    <p>-->
+<!--        Funding a project through crowdfunding is difficult. <br>-->
+<!--        In 2018, 53% of kickstarter fundraisers failed. <br>-->
+<!--        61% of projects raised less than half of their goal <br>-->
+<!--    </p>-->
+<!--</div>-->
+
+
+<div id="my_dataviz"></div>
+<div id="randomizer"></div>
+<script src='https://d3js.org/d3.v5.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/d3-annotation/2.5.1/d3-annotation.min.js'></script>
+<script>
+
+  function slide1() {
+
+    document.getElementById("description").innerHTML = "Funding a project through crowdfunding is difficult. <br>\n" +
+            "        In 2018, 53% of kickstarter fundraisers failed. <br> \n" +
+            "        61% of projects raised less than half of their goal ";
+
+    document.getElementById("my_dataviz").innerHTML = "";
+
+    // set the dimensions and margins of the graph
+    const width = 900,
+            height = 900,
+            margin = 80;
+
+    // The radius of the pieplot is half the width or half the height (smallest one). I subtract a bit of margin.
+    const radius = Math.min(width, height) / 2 - margin
+
+    // append the svg object to the div called 'my_dataviz'
+    const svg = d3.select("#my_dataviz")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height)
+            .append("g")
+            .attr("transform", `translate(${width/2},${height/2})`);
+
+    // Create dummy data
+    const data = {Successful: 136755, Failed: 197719, Canceled:38779, Suspended:1846}
+
+    // var data = [{'state':'Successful', 'count':136755},
+    //     {'state':'Failed', 'count':197719},
+    //     {'state':'Canceled', 'count':38779},
+    //     {'state':'Suspended', 'count':1846}]
+
+    // set the color scale
+    const color = d3.scaleOrdinal()
+            .domain(["a", "b", "c", "d", "e", "f", "g", "h"])
+            .range(d3.schemeDark2);
+
+    // Compute the position of each group on the pie:
+    const pie = d3.pie()
+            .sort(null) // Do not sort group by size
+            .value(d => d[1])
+    const data_ready = pie(Object.entries(data))
+
+    // The arc generator
+    const arc = d3.arc()
+            .innerRadius(radius * 0.5)         // This is the size of the donut hole
+            .outerRadius(radius * 0.8)
+
+    // Another arc that won't be drawn. Just for labels positioning
+    const outerArc = d3.arc()
+            .innerRadius(radius * 0.9)
+            .outerRadius(radius * 0.9)
+
+    svg
+            .selectAll('allSlices')
+            .data(data_ready)
+            .join('path')
+            .transition().delay(function(d, i) { return i * 500; }).duration(500)
+            .attrTween('d', function(d) {
+              var i = d3.interpolate(d.startAngle+0.1, d.endAngle);
+              return function(t) {
+                d.endAngle = i(t);
+                return arc(d);
+              }
+            })
+            .attr('d', arc)
+            .attr('fill', d => color(d.data[1]))
+            .attr("stroke", "white")
+            .style("stroke-width", "2px")
+            .style("opacity", 0.7)
+
+
+    // Build the pie chart: Basically, each part of the pie is a path that we build using the arc function.
+    // svg
+    //     .selectAll('allSlices')
+    //     .data(data_ready)
+    //     .join('path')
+    //     .attr('d', arc)
+    //     .attr('fill', d => color(d.data[1]))
+    //     .attr("stroke", "white")
+    //     .style("stroke-width", "2px")
+    //     .style("opacity", 0.7)
+    //     .transition().delay(function(d, i) { return i * 500; }).duration(500)
+    //     .attrTween('d', function(d) {
+    //         var i = d3.interpolate(d.startAngle+0.1, d.endAngle);
+    //         return function(t) {
+    //             d.endAngle = i(t);
+    //             return arc(d);
+    //         }
+    //     });
+
+    // Add the polylines between chart and labels:
+    svg
+            .selectAll('allPolylines')
+            .data(data_ready)
+            .join('polyline')
+            .transition().delay(function(d, i) { return i * 500; }).duration(500)
+            .attrTween('d', function(d) {
+              var i = d3.interpolate(d.startAngle+0.1, d.endAngle);
+              return function(t) {
+                d.endAngle = i(t);
+                return arc(d);
+              }
+            })
+            .attr("stroke", "black")
+            .style("fill", "none")
+            .attr("stroke-width", 1)
+            .attr('points', function(d) {
+              const posA = arc.centroid(d) // line insertion in the slice
+              const posB = outerArc.centroid(d) // line break: we use the other arc generator that has been built only for that
+              const posC = outerArc.centroid(d); // Label position = almost the same as posB
+              const midangle = d.startAngle + (d.endAngle - d.startAngle) / 2 // we need the angle to see if the X position will be at the extreme right or extreme left
+              posC[0] = radius * 0.95 * (midangle < Math.PI ? 1 : -1); // multiply by 1 or -1 to put it on the right or on the left
+              return [posA, posB, posC]
+            })
+
+    // Add the polylines between chart and labels:
+    svg
+            .selectAll('allLabels')
+            .data(data_ready)
+            .join('text')
+            .transition().delay(function(d, i) { return i * 500; }).duration(500)
+            .attrTween('d', function(d) {
+              var i = d3.interpolate(d.startAngle+0.1, d.endAngle);
+              return function(t) {
+                d.endAngle = i(t);
+                return arc(d);
+              }
+            })
+            .text(d => d.data[0])
+            .attr('transform', function(d) {
+              const pos = outerArc.centroid(d);
+              const midangle = d.startAngle + (d.endAngle - d.startAngle) / 2
+              pos[0] = radius * 0.99 * (midangle < Math.PI ? 1 : -1);
+              return `translate(${pos})`;
+            })
+            .style('text-anchor', function(d) {
+              const midangle = d.startAngle + (d.endAngle - d.startAngle) / 2
+              return (midangle < Math.PI ? 'start' : 'end')
+            })
+
+  }
+
+  function slide2() {
+    document.getElementById("description").innerHTML = "The 36% of projects that do succeed tend to be projects in\n" +
+            "\n" +
+            "Product Design, Tabletop Games, Shorts, Music, Documentary <br>\n" +
+            "\n" +
+            "Maybe it's time you make a new board game?"
+
+    document.getElementById("my_dataviz").innerHTML = "";
+
+    // set the dimensions and margins of the graph
+    // var margin = {top: 30, right: 30, bottom: 70, left: 60},
+    //         width = 460 - margin.left - margin.right,
+    //         height = 400 - margin.top - margin.bottom;
+
+    var margin = {top: 100, right: 250, bottom: 250, left: 100},
+            width = 400,
+            height = 400;
+
+    var margin = {top: 300, right: 250, bottom: 250, left: 300},
+            width2 = 400,
+            height2 = 400;
+
+    // append the svg object to the body of the page
+    var svg = d3.select("#my_dataviz")
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform",
+                    "translate(" + margin.left + "," + margin.top + ")");
+
+    var data = [{'category':'Product Design', 'count':7962},
+      {'category':'Tabletop Games', 'count':7866},
+      {'category':'Shorts', 'count':6673},
+      {'category':'Music', 'count':6432},
+      {'category':'Documentary', 'count':5924}]
+
+    var data2 = [{'category':'Product Design', 'count':14113},
+      {'category':'Documentary', 'count':10157},
+      {'category':'Video Games', 'count':9358},
+      {'category':'Food', 'count':8157},
+      {'category':'Music', 'count':6982}]
+
+    //Successful bar chart
+
+    // X axis
+    var x = d3.scaleBand()
+            .range([ 0, width ])
+            .domain(data.map(function(d) { return d.category; }))
+            .padding(0.2);
+    svg.append("g")
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(x))
+            .selectAll("text")
+            .attr("transform", "translate(-10,0)rotate(-45)")
+            .style("text-anchor", "end");
+
+    // Add Y axis
+    var y = d3.scaleLinear()
+            .domain([0, 15000])
+            .range([ height, 0]);
+    svg.append("g")
+            .call(d3.axisLeft(y));
+
+    // Bars
+    svg.selectAll("mybar")
+            .data(data)
+            .enter()
+            .append("rect")
+            .attr("x", function(d) { return x(d.category); })
+            .attr("y", function(d) { return y(0); })
+            .attr("width", x.bandwidth())
+            .attr("height", function(d) { return height - y(0); })
+            .attr("fill", "#69b3a2")
+
+    svg.selectAll("rect")
+            .transition()
+            .duration(1000)
+            .attr("y", function(d) {return y(d.count);})
+            .attr("height", function(d) {return height - y(d.count);})
+            .delay(function(d,i){console.log(i);return 100*i;})
+
+    const annotations_success = [
+      {
+        note: { label: "Product Design is the most successful Kickstarter project category." },
+        bgPadding: 20,
+        color: ['red'],
+        x: 50,
+        y: 200,
+        dy: -200,
+        dx: 500,
+        type: d3.annotationCalloutElbow,
+        connector: { end: "arrow" },
+        subject: { radius: 25, radiusPadding: 10 },
+      },
+      {
+        note: { label: "Maybe opt for a new board game idea, which can be just as successful as Product Design projects." },
+        bgPadding: 20,
+        color: ['red'],
+        x: 125,
+        y: 250,
+        dy: -100,
+        dx: 500,
+        type: d3.annotationCalloutElbow,
+        connector: { end: "arrow" },
+        subject: { radius: 25, radiusPadding: 10 },
+      },
+    ];
+
+    const showAnnotationsSuccess = d3.annotation().annotations(annotations_success);
+    svg.append('g').call(showAnnotationsSuccess).transition().duration(1000)
+
+
+    //Failed, canceled, suspended bar chart
+
+    // set the dimensions and margins of the graph
+    // var margin2 = {top: 30, right: 30, bottom: 70, left: 60},
+    //         width2 = 460 - margin2.left - margin2.right,
+    //         height2 = 400 - margin2.top - margin2.bottom;
+
+    var margin2 = {top: 300, right: 250, bottom: 250, left: 300},
+            width2 = 400,
+            height2 = 400;
+
+    // append the svg object to the body of the page
+    var svg = d3.select("#my_dataviz")
+            .append("svg")
+            .attr("width", width2 + margin2.left + margin2.right)
+            .attr("height", height2 + margin2.top + margin2.bottom)
+            .append("g")
+            .attr("transform",
+                    "translate(" + margin2.left + "," + margin2.top + ")");
+
+    // X axis
+    var x2 = d3.scaleBand()
+            .range([ 0, width2 ])
+            .domain(data2.map(function(d) { return d.category; }))
+            .padding(0.2);
+    svg.append("g")
+            .attr("transform", "translate(0," + height2 + ")")
+            .call(d3.axisBottom(x2))
+            .selectAll("text")
+            .attr("transform", "translate(-10,0)rotate(-45)")
+            .style("text-anchor", "end");
+
+    // Add Y axis
+    var y2 = d3.scaleLinear()
+            .domain([0, 15000])
+            .range([ height2, 0]);
+    svg.append("g")
+            .call(d3.axisLeft(y2));
+
+    // Bars
+    svg.selectAll("mybar")
+            .data(data2)
+            .enter()
+            .append("rect")
+            .attr("x", function(d) { return x2(d.category); })
+            .attr("y", function(d) { return y2(0); })
+            .attr("width", x2.bandwidth())
+            .attr("height", function(d) { return height2 - y2(0); })
+            .attr("fill", "#69b3a2")
+
+    svg.selectAll("rect")
+            .transition()
+            .duration(1000)
+            .attr("y", function(d) {return y2(d.count);})
+            .attr("height", function(d) {return height2 - y2(d.count);})
+            .delay(function(d,i){console.log(i);return 100*i;})
+
+    const annotations = [
+      {
+        note: { label: "However, this is also the case for failed/canceled/suspended projects." },
+        bgPadding: 20,
+        color: ['red'],
+        x: 50,
+        y: 30,
+        dy: -25,
+        dx: -50,
+        type: d3.annotationCalloutElbow,
+        connector: { end: "arrow" },
+        subject: { radius: 25, radiusPadding: 10 },
+      },
+    ];
+
+    const showAnnotations = d3.annotation().annotations(annotations);
+    svg.append('g').call(showAnnotations).transition().duration(1000)
+
+
+  }
+
+  async function slide3() {
+    document.getElementById("description").innerHTML = "Some Successful Projects";
+
+    document.getElementById("my_dataviz").innerHTML = "";
+
+    var data = await d3.csv("ks-projects-201801.csv");
+
+    var product_design = data.filter(function(row) {
+      return row['category'] == 'Product Design'
+    });
+
+    var tabletop_games = data.filter(function(row) {
+      return row['category'] == 'Tabletop Games'
+    });
+
+    var shorts = data.filter(function(row) {
+      return row['category'] == 'Shorts'
+    });
+
+    var music = data.filter(function(row) {
+      return row['category'] == 'Music'
+    });
+
+    var documentary = data.filter(function(row) {
+      return row['category'] == 'Documentary'
+    });
+
+    function getRandomInt(max) {
+      return Math.floor(Math.random() * max);
+    }
+
+    var selected_product_design = product_design[getRandomInt(product_design.length - 1)];
+    var selected_tabletop_games = tabletop_games[getRandomInt(tabletop_games.length - 1)];
+    var selected_shorts = shorts[getRandomInt(shorts.length - 1)];
+    var selected_music = music[getRandomInt(music.length - 1)];
+    var selected_documentary = documentary[getRandomInt(documentary.length - 1)];
+
+    document.getElementById("description").innerHTML = selected_product_design.name + selected_tabletop_games.name + selected_shorts.name + selected_music.name + selected_documentary.name;
+    // console.log(product_design.length)
+
+    var data = [{'currency':'USD', 'count':292795},
+      {'currency':'GBP', 'count':33696},
+      {'currency':'EUR', 'count':17243},
+      {'currency':'CAD', 'count':14761},
+      {'currency':'AUD', 'count':7847},
+      {'currency':'SEK', 'count':1758},
+      {'currency':'MXN', 'count':1752},
+      {'currency':'NZD', 'count':1447},
+      {'currency':'DKK', 'count':1116},
+      {'currency':'CHF', 'count':761},
+      {'currency':'NOK', 'count':710},
+      {'currency':'HKD', 'count':618},
+      {'currency':'SGD', 'count':555},
+      {'currency':'JPY', 'count':40}]
+
+    // set the dimensions and margins of the graph
+    var margin = {top: 30, right: 30, bottom: 70, left: 60},
+            width = 460 - margin.left - margin.right,
+            height = 400 - margin.top - margin.bottom;
+
+    // append the svg object to the body of the page
+    var svg = d3.select("#my_dataviz")
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform",
+                    "translate(" + margin.left + "," + margin.top + ")");
+
+    // X axis
+    var x = d3.scaleBand()
+            .range([ 0, width ])
+            .domain(data.map(function(d) { return d.currency; }))
+            .padding(0.2);
+    svg.append("g")
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(x))
+            .selectAll("text")
+            .attr("transform", "translate(-10,0)rotate(-45)")
+            .style("text-anchor", "end");
+
+    // Add Y axis
+    var y = d3.scaleLinear()
+            .domain([0, 300000])
+            .range([ height, 0]);
+    svg.append("g")
+            .call(d3.axisLeft(y));
+
+    // Bars
+    svg.selectAll("mybar")
+            .data(data)
+            .enter()
+            .append("rect")
+            .attr("x", function(d) { return x(d.currency); })
+            .attr("y", function(d) { return y(0); })
+            .attr("width", x.bandwidth())
+            .attr("height", function(d) { return height - y(0); })
+            .attr("fill", "#69b3a2")
+
+    svg.selectAll("rect")
+            .transition()
+            .duration(1000)
+            .attr("y", function(d) {return y(d.count);})
+            .attr("height", function(d) {return height - y(d.count);})
+            .delay(function(d,i){console.log(i);return 100*i;})
+
+
+    //histogram
+
+
+    // set the dimensions and margins of the graph
+    var margin = {top: 10, right: 30, bottom: 30, left: 40},
+            width = 460 - margin.left - margin.right,
+            height = 400 - margin.top - margin.bottom;
+
+    // append the svg object to the body of the page
+    var svg = d3.select("#my_dataviz")
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform",
+                    "translate(" + margin.left + "," + margin.top + ")");
+
+    // get the data
+    var data = await d3.csv("kickstarter_clean.csv");
+
+
+    // X axis: scale and draw:
+    var x = d3.scaleLinear()
+            .domain([0,91])     // can use this instead of 1000 to have the max of data: d3.max(data, function(d) { return +d.price })
+            .range([0, width]);
+    svg.append("g")
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(x));
+
+    // set the parameters for the histogram
+    var histogram = d3.histogram()
+            .value(function(d) { return +d.Difference; })   // I need to give the vector of value
+            .domain(x.domain())  // then the domain of the graphic
+            .thresholds(x.ticks(40)); // then the numbers of bins
+
+    // And apply twice this function to data to get the bins.
+    var bins1 = histogram(data.filter( function(d){return d.state === "successful" || d.state === "live"} ));
+    var bins2 = histogram(data.filter( function(d){return d.state != "successful" || d.state != "live"} ));
+
+    // Y axis: scale and draw:
+    var y = d3.scaleLinear()
+            .range([height, 0]);
+    y.domain([0, d3.max(bins1, function(d) { return d.length; })]);   // d3.hist has to be called before the Y axis obviously
+    svg.append("g")
+            .call(d3.axisLeft(y));
+
+    // append the bars for series 1
+    svg.selectAll("rect")
+            .data(bins1)
+            .enter()
+            .append("rect")
+            .attr("x", 1)
+            .attr("transform", function(d) { return "translate(" + x(d.x0) + "," + y(d.length) + ")"; })
+            .attr("width", function(d) { return x(d.x1) - x(d.x0) -1 ; })
+            .attr("height", function(d) { return height - y(d.length); })
+            .style("fill", "#69b3a2")
+            .style("opacity", 0.6)
+
+    // append the bars for series 2
+    svg.selectAll("rect2")
+            .data(bins2)
+            .enter()
+            .append("rect")
+            .attr("x", 1)
+            .attr("transform", function(d) { return "translate(" + x(d.x0) + "," + y(d.length) + ")"; })
+            .attr("width", function(d) { return x(d.x1) - x(d.x0) -1 ; })
+            .attr("height", function(d) { return height - y(d.length); })
+            .style("fill", "#404080")
+            .style("opacity", 0.3)
+
+    // Handmade legend
+    svg.append("circle").attr("cx",300).attr("cy",30).attr("r", 6).style("fill", "#69b3a2")
+    svg.append("circle").attr("cx",300).attr("cy",60).attr("r", 6).style("fill", "#404080")
+    svg.append("text").attr("x", 320).attr("y", 30).text("Successful/Live").style("font-size", "15px").attr("alignment-baseline","middle")
+    svg.append("text").attr("x", 320).attr("y", 60).text("Failed/Canceled/Suspended").style("font-size", "15px").attr("alignment-baseline","middle")
+
+
+  }
+
+  slide1()
+
+</script>
+</body>
+</html>
