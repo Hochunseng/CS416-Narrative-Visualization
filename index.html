@@ -10,6 +10,7 @@
   <button onclick="slide1()">1</button>
   <button onclick="slide2()">2</button>
   <button onclick="slide3()">3</button>
+  <button id="next" onclick="next()">next</button>
 </div>
 
 <div style="text-align:center;" id="description">
@@ -32,9 +33,13 @@
 
   function slide1() {
 
-    document.getElementById("description").innerHTML = "Funding a project through crowdfunding is difficult. <br>\n" +
-            "        In 2018, 53% of kickstarter fundraisers failed. <br> \n" +
-            "        61% of projects raised less than half of their goal ";
+    document.getElementById("next").innerHTML = "next";
+
+    currSlide = 1;
+
+    document.getElementById("description").innerHTML = "Funding a project through crowdfunding is difficult. <br> <br>\n" +
+            "        In 2018, <span style=\"color: #d95f02\">53%</span> of Kickstarter Campaigns failed. <br>  <br> \n" +
+            "        <span style=\"color: red\">61%</span> of projects raised less than half of their goal. ";
 
     document.getElementById("my_dataviz").innerHTML = "";
 
@@ -53,6 +58,14 @@
             .attr("height", height)
             .append("g")
             .attr("transform", `translate(${width/2},${height/2})`);
+
+    svg.append("text")
+            .attr("x", 0)
+            .attr("y", 0)
+            .attr("text-anchor", "middle")
+            .style("font-size", "30px")
+            .text("Kickstarter Project Conditions");
+
 
     // Create dummy data
     const data = {Successful: 136755, Failed: 197719, Canceled:38779, Suspended:1846}
@@ -83,10 +96,38 @@
             .innerRadius(radius * 0.9)
             .outerRadius(radius * 0.9)
 
+    tooltip = d3
+            .select('body')
+            .append('div')
+            .attr('class', 'd3-tooltip')
+            .style('position', 'absolute')
+            .style('z-index', '10')
+            .style('visibility', 'hidden')
+            .style('padding', '10px')
+            .style('background', 'rgba(0,0,0,0.6)')
+            .style('border-radius', '4px')
+            .style('color', '#fff')
+            .text('a simple tooltip');
+
     svg
             .selectAll('allSlices')
             .data(data_ready)
             .join('path')
+            .on('mouseover', function (d, i) {
+              tooltip
+                      .html(
+                              `<div>Count: ${d.value}</div><div>Percentage: ${d.value / 375099}</div>`
+                      )
+                      .style('visibility', 'visible');
+            })
+            .on('mousemove', function () {
+              tooltip
+                      .style('top', d3.event.pageY - 10 + 'px')
+                      .style('left', d3.event.pageX + 10 + 'px');
+            })
+            .on('mouseout', function () {
+              tooltip.html(``).style('visibility', 'hidden');
+            })
             .transition().delay(function(d, i) { return i * 500; }).duration(500)
             .attrTween('d', function(d) {
               var i = d3.interpolate(d.startAngle+0.1, d.endAngle);
@@ -175,11 +216,16 @@
   }
 
   function slide2() {
-    document.getElementById("description").innerHTML = "You may be wondering, which project categories succeed and which fail? <br> The 36% of projects that do succeed tend to be projects in " +
+
+    document.getElementById("next").innerHTML = "next";
+
+    currSlide = 2;
+
+    document.getElementById("description").innerHTML = "You may be wondering, which project categories succeed and which fail? <br> <br> The <span style=\"color: #1b9e77\">36%</span> of projects that do succeed tend to be projects in " +
             "\n" +
-            "Product Design, Tabletop Games, Shorts, Music, Documentary <br>" +
+            "<span style=\"color: #4e79a7\">Product Design</span>, <span style=\"color: #f28e2c\">Tabletop Games</span>, <span style=\"color: #e15759\">Shorts</span>, <span style=\"color: #76b7b2\">Music</span>, <span style=\"color: #59a14f\">Documentary</span> <br> <br>" +
             "\n" +
-            "On the other hand, the projects that fail, are canceled, or are suspended tend to be projects in Product Design, Documentary, Video Games, Food, and Music"
+            "On the other hand, the projects that fail, are canceled, or are suspended tend to be projects in <span style=\"color: #4e79a7\">Product Design</span>, <span style=\"color: #59a14f\">Documentary</span>, <span style=\"color: #edc949\">Video Games</span>, <span style=\"color: #af7aa1\">Food</span>, and <span style=\"color: #76b7b2\">Music</span>"
 
     document.getElementById("my_dataviz").innerHTML = "";
 
@@ -204,6 +250,27 @@
             .append("g")
             .attr("transform",
                     "translate(" + margin.left + "," + margin.top + ")");
+
+    svg.append("text")
+            .attr("x", width/2)
+            .attr("y", -30)
+            .attr("text-anchor", "middle")
+            .style("font-size", "30px")
+            .text("Category Distribution Of Successful Projects");
+
+    svg.append("text")
+            .attr("transform", "translate(" + (width/2) + " ," + (height + 150) + ")")
+            .style("text-anchor", "middle")
+            .text("Project Category")
+            .style("font-size", "30px");
+
+    svg.append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("x", -(height/2))
+            .attr("y", -80)
+            .style("text-anchor", "middle")
+            .text("Project Count")
+            .style("font-size", "30px");
 
     var data = [{'category':'Product Design', 'count':7962},
       {'category':'Tabletop Games', 'count':7866},
@@ -238,7 +305,76 @@
             .range([ height, 0]);
     svg.append("g")
             .call(d3.axisLeft(y))
-            .style("font-size", "20px");;
+            .style("font-size", "20px");
+
+    function detColor(category) {
+      if(category == 'Product Design') {
+        return '#4e79a7'
+      }
+      else if(category == 'Tabletop Games') {
+        return '#f28e2c'
+      }
+      else if(category == 'Shorts') {
+        return '#e15759'
+      }
+      else if(category == 'Music') {
+        return '#76b7b2'
+      }
+      else if(category == 'Documentary') {
+        return '#59a14f'
+      }
+      else if(category == 'Video Games') {
+        return '#edc949'
+      }
+      else if(category == 'Food') {
+        return '#af7aa1'
+      }
+    }
+
+    // // create a tooltip
+    // var Tooltip = d3.select("svg")
+    //         .append("div")
+    //         .style("opacity", 0)
+    //         .attr("class", "tooltip")
+    //         .style("background-color", "white")
+    //         .style("border", "solid")
+    //         .style("border-width", "2px")
+    //         .style("border-radius", "5px")
+    //         .style("padding", "5px")
+    //
+    // // Three function that change the tooltip when user hover / move / leave a cell
+    // var mouseover = function(d) {
+    //   Tooltip
+    //           .style("opacity", 1)
+    //   d3.select(this)
+    //           .style("stroke", "black")
+    //           .style("opacity", 1)
+    // }
+    // var mousemove = function(d) {
+    //   Tooltip
+    //           .html("The exact value of<br>this cell is: " + d.count)
+    //           .style("top", (event.pageY-800)+"px").style("left",(event.pageX-800)+"px")
+    // }
+    // var mouseleave = function(d) {
+    //   Tooltip
+    //           .style("opacity", 0)
+    //   d3.select(this)
+    //           .style("stroke", "none")
+    //           .style("opacity", 0.8)
+    // }
+
+    tooltip = d3
+            .select('body')
+            .append('div')
+            .attr('class', 'd3-tooltip')
+            .style('position', 'absolute')
+            .style('z-index', '10')
+            .style('visibility', 'hidden')
+            .style('padding', '10px')
+            .style('background', 'rgba(0,0,0,0.6)')
+            .style('border-radius', '4px')
+            .style('color', '#fff')
+            .text('a simple tooltip');
 
     // Bars
     svg.selectAll("mybar")
@@ -249,7 +385,25 @@
             .attr("y", function(d) { return y(0); })
             .attr("width", x.bandwidth())
             .attr("height", function(d) { return height - y(0); })
-            .attr("fill", "#69b3a2")
+            .attr("fill", function(d){return detColor(d.category);})
+            .on('mouseover', function (d, i) {
+              tooltip
+                      .html(
+                              `<div>Count: ${d.count}</div>`
+                      )
+                      .style('visibility', 'visible');
+            })
+            .on('mousemove', function () {
+              tooltip
+                      .style('top', d3.event.pageY - 10 + 'px')
+                      .style('left', d3.event.pageX + 10 + 'px');
+            })
+            .on('mouseout', function () {
+              tooltip.html(``).style('visibility', 'hidden');
+            });
+            // .on("mouseover", mouseover)
+            // .on("mousemove", mousemove)
+            // .on("mouseleave", mouseleave)
 
     svg.selectAll("rect")
             .transition()
@@ -286,7 +440,7 @@
     ];
 
     const showAnnotationsSuccess = d3.annotation().annotations(annotations_success);
-    svg.append('g').call(showAnnotationsSuccess).transition().duration(1000)
+    svg.append('g').call(showAnnotationsSuccess)
 
 
     //Failed, canceled, suspended bar chart
@@ -312,6 +466,27 @@
             .append("g")
             .attr("transform",
                     "translate(" + margin2.left + "," + margin2.top + ")");
+
+    svg.append("text")
+            .attr("x", width/2)
+            .attr("y", -30)
+            .attr("text-anchor", "middle")
+            .style("font-size", "27px")
+            .text("Category Distribution Of Failed/Canceled/Suspended Projects");
+
+    svg.append("text")
+            .attr("transform", "translate(" + (width/2) + " ," + (height + 150) + ")")
+            .style("text-anchor", "middle")
+            .text("Project Category")
+            .style("font-size", "30px");
+
+    svg.append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("x", -(height/2))
+            .attr("y", -80)
+            .style("text-anchor", "middle")
+            .text("Project Count")
+            .style("font-size", "30px");
 
     // X axis
     var x2 = d3.scaleBand()
@@ -343,7 +518,22 @@
             .attr("y", function(d) { return y2(0); })
             .attr("width", x2.bandwidth())
             .attr("height", function(d) { return height2 - y2(0); })
-            .attr("fill", "#69b3a2")
+            .attr("fill", function(d) {return detColor(d.category);})
+            .on('mouseover', function (d, i) {
+              tooltip
+                      .html(
+                              `<div>Count: ${d.count}</div>`
+                      )
+                      .style('visibility', 'visible');
+            })
+            .on('mousemove', function () {
+              tooltip
+                      .style('top', d3.event.pageY - 10 + 'px')
+                      .style('left', d3.event.pageX + 10 + 'px');
+            })
+            .on('mouseout', function () {
+              tooltip.html(``).style('visibility', 'hidden');
+            });
 
     svg.selectAll("rect")
             .transition()
@@ -374,43 +564,48 @@
   }
 
   async function slide3() {
-    document.getElementById("description").innerHTML = "Some Successful Projects";
+
+    document.getElementById("next").innerHTML = "start over";
+
+    currSlide = 3;
+
+    document.getElementById("description").innerHTML = "What about the most popular currencies used? <br> <br> The distribution of currencies can give an idea of where in the world Kickstarter Campaigns are usually held. <br> <br> You may also want to know how long Kickstarter Campaigns tend to be.";
 
     document.getElementById("my_dataviz").innerHTML = "";
 
-    var data = await d3.csv("ks-projects-201801.csv");
-
-    var product_design = data.filter(function(row) {
-      return row['category'] == 'Product Design'
-    });
-
-    var tabletop_games = data.filter(function(row) {
-      return row['category'] == 'Tabletop Games'
-    });
-
-    var shorts = data.filter(function(row) {
-      return row['category'] == 'Shorts'
-    });
-
-    var music = data.filter(function(row) {
-      return row['category'] == 'Music'
-    });
-
-    var documentary = data.filter(function(row) {
-      return row['category'] == 'Documentary'
-    });
-
-    function getRandomInt(max) {
-      return Math.floor(Math.random() * max);
-    }
-
-    var selected_product_design = product_design[getRandomInt(product_design.length - 1)];
-    var selected_tabletop_games = tabletop_games[getRandomInt(tabletop_games.length - 1)];
-    var selected_shorts = shorts[getRandomInt(shorts.length - 1)];
-    var selected_music = music[getRandomInt(music.length - 1)];
-    var selected_documentary = documentary[getRandomInt(documentary.length - 1)];
-
-    document.getElementById("description").innerHTML = selected_product_design.name + selected_tabletop_games.name + selected_shorts.name + selected_music.name + selected_documentary.name;
+    // var data = await d3.csv("ks-projects-201801.csv");
+    //
+    // var product_design = data.filter(function(row) {
+    //   return row['category'] == 'Product Design'
+    // });
+    //
+    // var tabletop_games = data.filter(function(row) {
+    //   return row['category'] == 'Tabletop Games'
+    // });
+    //
+    // var shorts = data.filter(function(row) {
+    //   return row['category'] == 'Shorts'
+    // });
+    //
+    // var music = data.filter(function(row) {
+    //   return row['category'] == 'Music'
+    // });
+    //
+    // var documentary = data.filter(function(row) {
+    //   return row['category'] == 'Documentary'
+    // });
+    //
+    // function getRandomInt(max) {
+    //   return Math.floor(Math.random() * max);
+    // }
+    //
+    // var selected_product_design = product_design[getRandomInt(product_design.length - 1)];
+    // var selected_tabletop_games = tabletop_games[getRandomInt(tabletop_games.length - 1)];
+    // var selected_shorts = shorts[getRandomInt(shorts.length - 1)];
+    // var selected_music = music[getRandomInt(music.length - 1)];
+    // var selected_documentary = documentary[getRandomInt(documentary.length - 1)];
+    //
+    // document.getElementById("description").innerHTML = selected_product_design.name + selected_tabletop_games.name + selected_shorts.name + selected_music.name + selected_documentary.name;
     // console.log(product_design.length)
 
     var data = [{'currency':'USD', 'count':292795},
@@ -429,9 +624,9 @@
       {'currency':'JPY', 'count':40}]
 
     // set the dimensions and margins of the graph
-    var margin = {top: 30, right: 30, bottom: 70, left: 60},
-            width = 460 - margin.left - margin.right,
-            height = 400 - margin.top - margin.bottom;
+    var margin = {top: 100, right: 100, bottom: 250, left: 100},
+            width = 900 - margin.left - margin.right,
+            height = 800 - margin.left - margin.right;
 
     // append the svg object to the body of the page
     var svg = d3.select("#my_dataviz")
@@ -441,6 +636,45 @@
             .append("g")
             .attr("transform",
                     "translate(" + margin.left + "," + margin.top + ")");
+
+    svg.append("text")
+            .attr("x", width/2)
+            .attr("y", -30)
+            .attr("text-anchor", "middle")
+            .style("font-size", "30px")
+            .text("Currency Distribution");
+
+    svg.append("text")
+            .attr("transform", "translate(" + (width/2) + " ," + (height + 100) + ")")
+            .style("text-anchor", "middle")
+            .text("Currency")
+            .style("font-size", "30px");
+
+    svg.append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("x", -(height/2))
+            .attr("y", -80)
+            .style("text-anchor", "middle")
+            .text("Currency Count")
+            .style("font-size", "30px");
+
+    const annotations_success = [
+      {
+        note: { label: "USD is the most popular currency for Kickstarter Campaigns, but here are other currencies that are also supported." },
+        bgPadding: 20,
+        color: ['red'],
+        x: 45,
+        y: 300,
+        dy: -200,
+        dx: 500,
+        type: d3.annotationCalloutElbow,
+        connector: { end: "arrow" },
+        subject: { radius: 25, radiusPadding: 10 },
+      }
+    ];
+
+    const showAnnotationsSuccess = d3.annotation().annotations(annotations_success);
+    svg.append('g').call(showAnnotationsSuccess)
 
     // X axis
     var x = d3.scaleBand()
@@ -452,7 +686,7 @@
             .call(d3.axisBottom(x))
             .selectAll("text")
             .attr("transform", "translate(-10,0)rotate(-45)")
-            .style("text-anchor", "end");
+            .style("text-anchor", "end")
 
     // Add Y axis
     var y = d3.scaleLinear()
@@ -460,6 +694,19 @@
             .range([ height, 0]);
     svg.append("g")
             .call(d3.axisLeft(y));
+
+    tooltip = d3
+            .select('body')
+            .append('div')
+            .attr('class', 'd3-tooltip')
+            .style('position', 'absolute')
+            .style('z-index', '10')
+            .style('visibility', 'hidden')
+            .style('padding', '10px')
+            .style('background', 'rgba(0,0,0,0.6)')
+            .style('border-radius', '4px')
+            .style('color', '#fff')
+            .text('a simple tooltip');
 
     // Bars
     svg.selectAll("mybar")
@@ -471,6 +718,21 @@
             .attr("width", x.bandwidth())
             .attr("height", function(d) { return height - y(0); })
             .attr("fill", "#69b3a2")
+            .on('mouseover', function (d, i) {
+              tooltip
+                      .html(
+                              `<div>Count: ${d.count}</div>`
+                      )
+                      .style('visibility', 'visible');
+            })
+            .on('mousemove', function () {
+              tooltip
+                      .style('top', d3.event.pageY - 10 + 'px')
+                      .style('left', d3.event.pageX + 10 + 'px');
+            })
+            .on('mouseout', function () {
+              tooltip.html(``).style('visibility', 'hidden');
+            });
 
     svg.selectAll("rect")
             .transition()
@@ -484,18 +746,39 @@
 
 
     // set the dimensions and margins of the graph
-    var margin = {top: 10, right: 30, bottom: 30, left: 40},
-            width = 460 - margin.left - margin.right,
-            height = 400 - margin.top - margin.bottom;
+    var margin2 = {top: 100, right: 100, bottom: 250, left: 200},
+            width2 = 900 - margin.left - margin.right,
+            height2 = 800 - margin.left - margin.right;
 
     // append the svg object to the body of the page
     var svg = d3.select("#my_dataviz")
             .append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
+            .attr("width", width + margin2.left + margin2.right)
+            .attr("height", height + margin2.top + margin2.bottom)
             .append("g")
             .attr("transform",
-                    "translate(" + margin.left + "," + margin.top + ")");
+                    "translate(" + margin2.left + "," + margin2.top + ")");
+
+    svg.append("text")
+            .attr("x", width/2 + 120)
+            .attr("y", -30)
+            .attr("text-anchor", "middle")
+            .style("font-size", "30px")
+            .text("Length of Campaign Distribution");
+
+    svg.append("text")
+            .attr("transform", "translate(" + (width/2) + " ," + (height + 100) + ")")
+            .style("text-anchor", "middle")
+            .text("Length of Campaign (Days)")
+            .style("font-size", "30px");
+
+    svg.append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("x", -(height/2))
+            .attr("y", -80)
+            .style("text-anchor", "middle")
+            .text("Length of Campaign (Days) Count")
+            .style("font-size", "30px");
 
     // get the data
     var data = await d3.csv("kickstarter_clean.csv");
@@ -507,7 +790,39 @@
             .range([0, width]);
     svg.append("g")
             .attr("transform", "translate(0," + height + ")")
+            // .transition()
+            // .duration(1000)
             .call(d3.axisBottom(x));
+
+    const annotations = [
+      {
+        note: { label: "Kickstarter Campaigns are usually a month long for both successful and failed projects." },
+        bgPadding: 20,
+        color: ['red'],
+        x: 220,
+        y: 175,
+        dy: -50,
+        dx: 125,
+        type: d3.annotationCalloutElbow,
+        connector: { end: "arrow" },
+        subject: { radius: 25, radiusPadding: 10 },
+      },
+      {
+        note: { label: "There are much less successes and more failures around two months. You may not want to campaign for too long." },
+        bgPadding: 20,
+        color: ['red'],
+        x: 450,
+        y: 300,
+        dy: -50,
+        dx: 125,
+        type: d3.annotationCalloutElbow,
+        connector: { end: "arrow" },
+        subject: { radius: 25, radiusPadding: 10 },
+      }
+    ];
+
+    const showAnnotations = d3.annotation().annotations(annotations);
+    svg.append('g').call(showAnnotations)
 
     // set the parameters for the histogram
     var histogram = d3.histogram()
@@ -524,13 +839,17 @@
             .range([height, 0]);
     y.domain([0, d3.max(bins1, function(d) { return d.length; })]);   // d3.hist has to be called before the Y axis obviously
     svg.append("g")
+            // .transition()
+            // .duration(1000)
             .call(d3.axisLeft(y));
 
     // append the bars for series 1
-    svg.selectAll("rect")
+    var rect = svg.selectAll("rect")
             .data(bins1)
             .enter()
             .append("rect")
+            // .transition()
+            // .duration(1000)
             .attr("x", 1)
             .attr("transform", function(d) { return "translate(" + x(d.x0) + "," + y(d.length) + ")"; })
             .attr("width", function(d) { return x(d.x1) - x(d.x0) -1 ; })
@@ -538,11 +857,32 @@
             .style("fill", "#69b3a2")
             .style("opacity", 0.6)
 
+    rect.transition().duration(1000);
+    rect.on('mouseover', function (d, i) {
+      tooltip
+              .html(
+                      `<div>Range: ${d.x0 + "-" + d.x1}</div>`
+              )
+              .style('visibility', 'visible');
+    })
+            .on('mousemove', function () {
+              tooltip
+                      .style('top', d3.event.pageY - 10 + 'px')
+                      .style('left', d3.event.pageX + 10 + 'px');
+            })
+            .on('mouseout', function () {
+              tooltip.html(``).style('visibility', 'hidden');
+            });
+
+
+
     // append the bars for series 2
-    svg.selectAll("rect2")
+    var rect2 = svg.selectAll("rect2")
             .data(bins2)
             .enter()
             .append("rect")
+            // .transition()
+            // .duration(1000)
             .attr("x", 1)
             .attr("transform", function(d) { return "translate(" + x(d.x0) + "," + y(d.length) + ")"; })
             .attr("width", function(d) { return x(d.x1) - x(d.x0) -1 ; })
@@ -550,16 +890,46 @@
             .style("fill", "#404080")
             .style("opacity", 0.3)
 
+    rect2.transition().duration(1000);
+    rect2.on('mouseover', function (d, i) {
+      tooltip
+              .html(
+                      `<div>Range: ${d.x0 + "-" + d.x1}</div>`
+              )
+              .style('visibility', 'visible');
+    })
+            .on('mousemove', function () {
+              tooltip
+                      .style('top', d3.event.pageY - 10 + 'px')
+                      .style('left', d3.event.pageX + 10 + 'px');
+            })
+            .on('mouseout', function () {
+              tooltip.html(``).style('visibility', 'hidden');
+            });
+
     // Handmade legend
-    svg.append("circle").attr("cx",300).attr("cy",30).attr("r", 6).style("fill", "#69b3a2")
-    svg.append("circle").attr("cx",300).attr("cy",60).attr("r", 6).style("fill", "#404080")
-    svg.append("text").attr("x", 320).attr("y", 30).text("Successful/Live").style("font-size", "15px").attr("alignment-baseline","middle")
-    svg.append("text").attr("x", 320).attr("y", 60).text("Failed/Canceled/Suspended").style("font-size", "15px").attr("alignment-baseline","middle")
+    svg.append("circle").attr("cx",550).attr("cy",30).attr("r", 6).style("fill", "#69b3a2")
+    svg.append("circle").attr("cx",550).attr("cy",60).attr("r", 6).style("fill", "#404080")
+    svg.append("text").attr("x", 570).attr("y", 30).text("Successful/Live").style("font-size", "15px").attr("alignment-baseline","middle")
+    svg.append("text").attr("x", 570).attr("y", 60).text("Failed/Canceled/Suspended").style("font-size", "15px").attr("alignment-baseline","middle")
 
 
   }
 
-  slide1()
+  function next() {
+    if(currSlide == 1) {
+      slide2();
+    }
+    else if(currSlide == 2) {
+      slide3();
+    }
+    else if(currSlide == 3) {
+      slide1();
+    }
+  }
+
+  var currSlide = 1;
+  slide1();
 
 </script>
 </body>
