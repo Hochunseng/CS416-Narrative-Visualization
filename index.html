@@ -16,17 +16,17 @@
 <div style="text-align:center;" id="description">
 
 </div>
-<!--<div id="slide1text">-->
-<!--    <p>-->
-<!--        Funding a project through crowdfunding is difficult. <br>-->
-<!--        In 2018, 53% of kickstarter fundraisers failed. <br>-->
-<!--        61% of projects raised less than half of their goal <br>-->
-<!--    </p>-->
-<!--</div>-->
-
 
 <div style="text-align:center;" id="my_dataviz"></div>
-<div id="randomizer"></div>
+<div style="text-align:center;" id="randomizerTitle"></div>
+<div style="text-align:center;" id="randomizer">
+  <div id="Product Design"></div>
+  <div id="Tabletop Games"></div>
+  <div id="Shorts"></div>
+  <div id="Music"></div>
+  <div id="Documentary"></div>
+</div>
+
 <script src='https://d3js.org/d3.v5.min.js'></script>
 <script src='https://cdnjs.cloudflare.com/ajax/libs/d3-annotation/2.5.1/d3-annotation.min.js'></script>
 <script>
@@ -410,7 +410,7 @@
             .duration(1000)
             .attr("y", function(d) {return y(d.count);})
             .attr("height", function(d) {return height - y(d.count);})
-            .delay(function(d,i){console.log(i);return 100*i;})
+            .delay(function(d,i){return 100*i;})
 
     const annotations_success = [
       {
@@ -540,7 +540,7 @@
             .duration(1000)
             .attr("y", function(d) {return y2(d.count);})
             .attr("height", function(d) {return height2 - y2(d.count);})
-            .delay(function(d,i){console.log(i);return 100*i;})
+            .delay(function(d,i){return 100*i;})
 
     const annotations = [
       {
@@ -739,7 +739,7 @@
             .duration(1000)
             .attr("y", function(d) {return y(d.count);})
             .attr("height", function(d) {return height - y(d.count);})
-            .delay(function(d,i){console.log(i);return 100*i;})
+            .delay(function(d,i){return 100*i;})
 
 
     //histogram
@@ -861,7 +861,7 @@
     rect.on('mouseover', function (d, i) {
       tooltip
               .html(
-                      `<div>Range: ${d.x0 + "-" + d.x1}</div>`
+                      `<div>Range: ${d.x0 + "-" + d.x1}</div><div>Count: ${d.length}</div>`
               )
               .style('visibility', 'visible');
     })
@@ -894,7 +894,7 @@
     rect2.on('mouseover', function (d, i) {
       tooltip
               .html(
-                      `<div>Range: ${d.x0 + "-" + d.x1}</div>`
+                      `<div>Range: ${d.x0 + "-" + d.x1}</div><div>Count: ${d.length}</div>`
               )
               .style('visibility', 'visible');
     })
@@ -913,6 +913,92 @@
     svg.append("text").attr("x", 570).attr("y", 30).text("Successful/Live").style("font-size", "15px").attr("alignment-baseline","middle")
     svg.append("text").attr("x", 570).attr("y", 60).text("Failed/Canceled/Suspended").style("font-size", "15px").attr("alignment-baseline","middle")
 
+
+    // var product_design = data.filter(function(row) {
+    //   return row['category'] == 'Product Design' && row['state'] == 'successful'
+    // });
+    //
+    // var tabletop_games = data.filter(function(row) {
+    //   return row['category'] == 'Tabletop Games' && row['state'] == 'successful'
+    // });
+    //
+    // var shorts = data.filter(function(row) {
+    //   return row['category'] == 'Shorts' && row['state'] == 'successful'
+    // });
+    //
+    // var music = data.filter(function(row) {
+    //   return row['category'] == 'Music' && row['state'] == 'successful'
+    // });
+    //
+    // var documentary = data.filter(function(row) {
+    //   return row['category'] == 'Documentary' && row['state'] == 'successful'
+    // });
+    //
+    // function getRandomInt(max) {
+    //   return Math.floor(Math.random() * max);
+    // }
+    //
+    // function randomProjects() {
+    //   var selected_product_design = product_design[getRandomInt(product_design.length - 1)];
+    //   var selected_tabletop_games = tabletop_games[getRandomInt(tabletop_games.length - 1)];
+    //   var selected_shorts = shorts[getRandomInt(shorts.length - 1)];
+    //   var selected_music = music[getRandomInt(music.length - 1)];
+    //   var selected_documentary = documentary[getRandomInt(documentary.length - 1)];
+    //
+    //   document.getElementById("Product Design").innerHTML = 'Product Design: <br>' + selected_product_design.name + '<br>'
+    //   document.getElementById("Tabletop Games").innerHTML = 'Tabletop Games: <br>' + selected_tabletop_games.name + '<br>'
+    //   document.getElementById("Shorts").innerHTML = 'Shorts: <br>' + selected_shorts.name + '<br>'
+    //   document.getElementById("Music").innerHTML = 'Music: <br>' + selected_music.name + '<br>'
+    //   document.getElementById("Documentary").innerHTML = 'Documentary: <br>' + selected_documentary.name + '<br>'
+    //
+    //   var image1 = document.createElement("img");
+    //   image1.setAttribute("src", "images/productdesign.jpg");
+    //   image1.setAttribute("height", "100");
+    //   image1.setAttribute("width", "100");
+    //   image1.setAttribute("alt", "product design");
+    //
+    //   var image2 = document.createElement("img");
+    //   image2.setAttribute("src", "images/tabletopgames.jpg");
+    //   image2.setAttribute("height", "100");
+    //   image2.setAttribute("width", "100");
+    //   image2.setAttribute("alt", "tabletop games");
+    //
+    //   var image3 = document.createElement("img");
+    //   image3.setAttribute("src", "images/shorts.jpg");
+    //   image3.setAttribute("height", "100");
+    //   image3.setAttribute("width", "100");
+    //   image3.setAttribute("alt", "shorts");
+    //
+    //   var image4 = document.createElement("img");
+    //   image4.setAttribute("src", "images/music.jpg");
+    //   image4.setAttribute("height", "100");
+    //   image4.setAttribute("width", "100");
+    //   image4.setAttribute("alt", "music");
+    //
+    //   var image5 = document.createElement("img")
+    //   image5.setAttribute("src", "images/documentary.jpg");
+    //   image5.setAttribute("height", "100");
+    //   image5.setAttribute("width", "100");
+    //   image5.setAttribute("alt", "product design");
+    //
+    //   document.getElementById("Product Design").appendChild(image1)
+    //   document.getElementById("Tabletop Games").appendChild(image2)
+    //   document.getElementById("Shorts").appendChild(image3)
+    //   document.getElementById("Music").appendChild(image4)
+    //   document.getElementById("Documentary").appendChild(image5)
+    // }
+    //
+    // randomProjects();
+    //
+    // document.getElementById("randomizerTitle").innerHTML = 'Random Successful Projects <br> <br>'
+    //
+    // var randomizerButton = document.createElement("button");
+    // randomizerButton.innerHTML = "More Random Projects";
+    // randomizerButton.onclick = function() {
+    //   randomProjects();
+    // };
+    //
+    // document.getElementById("randomizerTitle").appendChild(randomizerButton);
 
   }
 

@@ -6,6 +6,16 @@
     font-size: 30px;
 }
 
+#randomizer {
+    display: flex;
+    justify-content: space-around;
+}
+
+#randomizerImages {
+    display: flex;
+    justify-content: space-around;
+}
+
 /*svg {*/
 /*    margin-right: 250px;*/
 /*    margin-left: 250px;*/
