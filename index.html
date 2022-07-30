@@ -17,8 +17,20 @@
 
 </div>
 
+<div style="text-align:center;" id="credits">
+  Credits/Citations: <br>
+  The dataset used for these visualizations is from <a href="https://www.kaggle.com/datasets/kemical/kickstarter-projects">https://www.kaggle.com/datasets/kemical/kickstarter-projects</a>
+  <br>
+  Data exploration and cleaning done in Python with the Pandas library in Jupyter Notebook <br>
+  Special thanks to d3.js examples from <a href="https://d3-graph-gallery.com/index.html">d3 Graph Gallery</a> , <a href="https://observablehq.com/">Observable HQ</a>, <a href="https://stackoverflow.com/questions/20501067/animating-d3-donut-chart-on-load">Stack Overflow</a>, <a href="https://www.tomordonez.com/d3-bar-chart-title-and-labels/">Tom Ordonez</a>
+  <br> <br>
+</div>
+
 <div style="text-align:center;" id="filter"></div>
 <div style="text-align:center;" id="filterCurrency"></div>
+
+<div style="text-align:center;" id="directions">
+</div>
 
 <div style="text-align:center;" id="my_dataviz"></div>
 <div style="text-align:center;" id="randomizerTitle"></div>
@@ -41,13 +53,20 @@
     currSlide = 1;
 
     document.getElementById("description").innerHTML = "Funding a project through crowdfunding is difficult. <br> <br>\n" +
-            "        In 2018, <span style=\"color: #d95f02\">53%</span> of Kickstarter Campaigns failed. <br>  <br> \n" +
-            "        <span style=\"color: red\">61%</span> of projects raised less than half of their goal. ";
+            "        In 2018, <span style=\"color: #d95f02\">53%</span> of Kickstarter Campaigns failed (did not raise enough funding to meet the declared goal). <br>  <br> \n" +
+            "        61% of projects raised less than half of their goal. <br> <br>" +
+            "Overall, <span style=\"color: red\">64%</span> of projects were unsuccessful (either <span style=\"color: #d95f02\">failed</span>, <span style=\"color: #7570b3\">canceled</span>, or <span style=\"color: #e7298a\">suspended</span>). <br> <br> ";
 
     document.getElementById("my_dataviz").innerHTML = "";
 
     document.getElementById('filter').innerHTML = "";
     document.getElementById('filterCurrency').innerHTML = "";
+    document.getElementById("directions").innerHTML = "";
+
+    var hoverDirections = document.createElement("div");
+    hoverDirections.innerHTML = "Tip: You can hover your mouse over a piece of the donut for the exact count and proportion of the specific category"
+
+    document.getElementById("directions").appendChild(hoverDirections);
 
     // set the dimensions and margins of the graph
     const width = 1200,
@@ -242,6 +261,13 @@
     document.getElementById('filter').innerHTML = "";
     document.getElementById('filterCurrency').innerHTML = "";
 
+    document.getElementById("directions").innerHTML = "";
+
+    var hoverDirections = document.createElement("div");
+    hoverDirections.innerHTML = "<br> Tip: You can hover your mouse over a bar in the bar chart for the exact count of the specific category"
+
+    document.getElementById("directions").appendChild(hoverDirections);
+
     successfulBarChart();
 
     var successfulButton = document.createElement("button");
@@ -251,11 +277,15 @@
     };
 
     var failedButton = document.createElement("button");
-    failedButton.innerHTML = "Failed/Canceled/Suspended Projects";
+    failedButton.innerHTML = "Unsuccessful";
     failedButton.onclick = function() {
       failedBarChart();
     };
 
+    var directions = document.createElement("div");
+    directions.innerHTML = "You can filter the bar chart by successful or unsuccessful projects using the below buttons: <br> <br>"
+
+    document.getElementById("filter").appendChild(directions);
     document.getElementById("filter").appendChild(successfulButton);
     document.getElementById("filter").appendChild(failedButton);
 
@@ -264,7 +294,7 @@
       document.getElementById("description").innerHTML = "";
 
 
-      document.getElementById("description").innerHTML = "You may be wondering, which project categories succeed and which fail? <br> <br> The <span style=\"color: #1b9e77\">36%</span> of projects that do succeed tend to be projects in " +
+      document.getElementById("description").innerHTML = "You may be wondering, which project categories succeed and which end up unsuccessful? <br> <br> The <span style=\"color: #1b9e77\">36%</span> of projects that do succeed tend to be projects in " +
               "\n" +
               "<span style=\"color: #4e79a7\">Product Design</span>, <span style=\"color: #f28e2c\">Tabletop Games</span>, <span style=\"color: #e15759\">Shorts</span>, <span style=\"color: #76b7b2\">Music</span>, <span style=\"color: #59a14f\">Documentary</span> <br> <br>"
       document.getElementById("my_dataviz").innerHTML = "";
@@ -441,8 +471,8 @@
 
       document.getElementById("description").innerHTML = "";
 
-      document.getElementById("description").innerHTML = "You may be wondering, which project categories succeed and which fail? <br> <br>" +
-              "On the other hand, the projects that fail, are canceled, or are suspended tend to be projects in <span style=\"color: #4e79a7\">Product Design</span>, <span style=\"color: #59a14f\">Documentary</span>, <span style=\"color: #edc949\">Video Games</span>, <span style=\"color: #af7aa1\">Food</span>, and <span style=\"color: #76b7b2\">Music</span> <br> <br>"
+      document.getElementById("description").innerHTML = "You may be wondering, which project categories succeed and which end up unsuccessful? <br> <br>" +
+              "On the other hand, the <span style=\"color: red\">64%</span> of projects that are unsuccessful (<span style=\"color: #d95f02\">failed</span>, <span style=\"color: #7570b3\">canceled</span>, <span style=\"color: #e7298a\">suspended</span>) tend to be projects in <span style=\"color: #4e79a7\">Product Design</span>, <span style=\"color: #59a14f\">Documentary</span>, <span style=\"color: #edc949\">Video Games</span>, <span style=\"color: #af7aa1\">Food</span>, and <span style=\"color: #76b7b2\">Music</span> <br> <br>"
       document.getElementById("my_dataviz").innerHTML = "";
 
       //Failed, canceled, suspended bar chart
@@ -487,7 +517,7 @@
               .attr("y", -30)
               .attr("text-anchor", "middle")
               .style("font-size", "27px")
-              .text("Category Distribution Of Failed/Canceled/Suspended Projects");
+              .text("Category Distribution Of Unsuccessful Projects");
 
       svg.append("text")
               .attr("transform", "translate(" + (width / 2) + " ," + (height + 150) + ")")
@@ -575,7 +605,7 @@
 
       const annotations = [
         {
-          note: {label: "However, this is also the case for failed/canceled/suspended projects."},
+          note: {label: "However, this is also the case for unsuccessful projects."},
           bgPadding: 20,
           color: ['red'],
           x: 50,
@@ -603,6 +633,13 @@
     document.getElementById("description").innerHTML = "What about the most popular currencies used? <br> <br> The distribution of currencies can give an idea of where in the world Kickstarter Campaigns are usually held. <br> <br> You may also want to know how long Kickstarter Campaigns tend to be. <br> <br>";
 
     document.getElementById("my_dataviz").innerHTML = "";
+
+    document.getElementById("directions").innerHTML = "";
+
+    var hoverDirections = document.createElement("div");
+    hoverDirections.innerHTML = "<br> Tip: You can hover your mouse over a bar in the bar chart or bar in the histogram for the exact count of the specific category/bucket"
+
+    document.getElementById("directions").appendChild(hoverDirections);
 
     // var data = await d3.csv("ks-projects-201801.csv");
     //
@@ -713,11 +750,15 @@
     };
 
     var failedButton = document.createElement("button");
-    failedButton.innerHTML = "Failed/Canceled/Suspended Projects";
+    failedButton.innerHTML = "Unsuccessful Projects";
     failedButton.onclick = function() {
       failedBarChart();
     };
 
+    var directions = document.createElement("div");
+    directions.innerHTML = "You can filter the bar chart by successful or unsuccessful projects using the below buttons: <br> <br>"
+
+    document.getElementById("filter").appendChild(directions);
     document.getElementById("filter").appendChild(successfulButton);
     document.getElementById("filter").appendChild(failedButton);
 
@@ -895,7 +936,7 @@
               .attr("y", -30)
               .attr("text-anchor", "middle")
               .style("font-size", "30px")
-              .text("Currency Distribution of Failed/Canceled/Suspended Projects");
+              .text("Currency Distribution of Unsuccessful Projects");
 
       svg.append("text")
               .attr("transform", "translate(" + (width / 2) + " ," + (height + 100) + ")")
@@ -1099,8 +1140,8 @@
         note: { label: "There are much less successes and more failures around two months. You may not want to campaign for too long." },
         bgPadding: 20,
         color: ['red'],
-        x: 450,
-        y: 300,
+        x: 455,
+        y: 500,
         dy: -50,
         dx: 125,
         type: d3.annotationCalloutElbow,
@@ -1198,8 +1239,8 @@
     // Handmade legend
     svg.append("circle").attr("cx",550).attr("cy",30).attr("r", 6).style("fill", "#69b3a2")
     svg.append("circle").attr("cx",550).attr("cy",60).attr("r", 6).style("fill", "#404080")
-    svg.append("text").attr("x", 570).attr("y", 30).text("Successful/Live").style("font-size", "15px").attr("alignment-baseline","middle")
-    svg.append("text").attr("x", 570).attr("y", 60).text("Failed/Canceled/Suspended").style("font-size", "15px").attr("alignment-baseline","middle")
+    svg.append("text").attr("x", 570).attr("y", 30).text("Successful").style("font-size", "15px").attr("alignment-baseline","middle")
+    svg.append("text").attr("x", 570).attr("y", 60).text("Unsuccessful").style("font-size", "15px").attr("alignment-baseline","middle")
 
 }
     // var product_design = data.filter(function(row) {
