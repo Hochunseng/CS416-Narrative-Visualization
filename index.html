@@ -18,7 +18,9 @@
 </div>
 
 <div style="text-align:center;" id="credits">
-  Credits/Citations: <br>
+  Interactive Slide Show Narrative Visualization By: Jason Ho (jasonho4) <br> <br>
+
+  <b>Credits/Citations: </b> <br>
   The dataset used for these visualizations is from <a href="https://www.kaggle.com/datasets/kemical/kickstarter-projects">https://www.kaggle.com/datasets/kemical/kickstarter-projects</a>
   <br>
   Data exploration and cleaning done in Python with the Pandas library in Jupyter Notebook <br>
@@ -56,7 +58,7 @@
     document.getElementById("directions").innerHTML = "";
 
     var hoverDirections = document.createElement("div");
-    hoverDirections.innerHTML = "Tip: You can hover your mouse over a piece of the donut for the exact count and proportion of the specific category"
+    hoverDirections.innerHTML = "<b>Tip:</b> You can hover your mouse over a piece of the donut for the exact count and proportion of the specific category"
 
     document.getElementById("directions").appendChild(hoverDirections);
 
@@ -219,7 +221,7 @@
     document.getElementById("directions").innerHTML = "";
 
     var hoverDirections = document.createElement("div");
-    hoverDirections.innerHTML = "<br> Tip: You can hover your mouse over a bar in the bar chart for the exact count of the specific category"
+    hoverDirections.innerHTML = "<br> <b>Tip:</b> You can hover your mouse over a bar in the bar chart for the exact count of the specific category"
 
     document.getElementById("directions").appendChild(hoverDirections);
 
@@ -238,7 +240,7 @@
     };
 
     var directions = document.createElement("div");
-    directions.innerHTML = "You can filter the bar chart by successful or unsuccessful projects using the below buttons: <br> <br>"
+    directions.innerHTML = "<b>You can filter the bar chart by successful or unsuccessful projects using the below buttons: </b> <br> <br>"
 
     document.getElementById("filter").appendChild(directions);
     document.getElementById("filter").appendChild(successfulButton);
@@ -608,7 +610,7 @@
     document.getElementById("directions").innerHTML = "";
 
     var hoverDirections = document.createElement("div");
-    hoverDirections.innerHTML = "<br> Tip: You can hover your mouse over a bar in the bar chart or bar in the histogram for the exact count of the specific category/bucket"
+    hoverDirections.innerHTML = "<br> <b>Tip: </b> You can hover your mouse over a bar in the bar chart or bar in the histogram for the exact count of the specific category/bucket"
 
     document.getElementById("directions").appendChild(hoverDirections);
 
@@ -692,7 +694,7 @@
     };
 
     var directions = document.createElement("div");
-    directions.innerHTML = "You can filter the bar chart by successful or unsuccessful projects using the below buttons: <br> <br>"
+    directions.innerHTML = "<b>You can filter the bar chart by successful or unsuccessful projects using the below buttons: </b> <br> <br>"
 
     document.getElementById("filter").appendChild(directions);
     document.getElementById("filter").appendChild(successfulButton);
