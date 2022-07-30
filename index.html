@@ -552,13 +552,37 @@
 
       const annotations = [
         {
-          note: {label: "However, this is also the case for unsuccessful projects."},
+          note: {label: "Product design is also the most popular for unsuccessful projects, you may want to stray from these types of projects"},
           bgPadding: 20,
           color: ['red'],
-          x: 50,
-          y: 30,
+          x: 90,
+          y: 170,
           dy: -25,
-          dx: -50,
+          dx: 50,
+          type: d3.annotationCalloutElbow,
+          connector: {end: "arrow"},
+          subject: {radius: 25, radiusPadding: 10},
+        },
+        {
+          note: {label: "Documentary also overlaps with successful projects"},
+          bgPadding: 20,
+          color: ['red'],
+          x: 230,
+          y: 210,
+          dy: -25,
+          dx: 50,
+          type: d3.annotationCalloutElbow,
+          connector: {end: "arrow"},
+          subject: {radius: 25, radiusPadding: 10},
+        },
+        {
+          note: {label: "Music also overlaps with successful projects"},
+          bgPadding: 20,
+          color: ['red'],
+          x: 610,
+          y: 350,
+          dy: -85,
+          dx: -60,
           type: d3.annotationCalloutElbow,
           connector: {end: "arrow"},
           subject: {radius: 25, radiusPadding: 10},
@@ -724,7 +748,7 @@
           subject: {radius: 25, radiusPadding: 10},
         },
         {
-          note: {label: "But currencies outside the US and UK differ in usage amount between Successful and Unsuccessful projects. For successful projects, the Canadian dollar is the third most common currency."},
+          note: {label: "But currencies outside the US and UK differ in usage amount between successful and unsuccessful projects. For successful projects, the Canadian dollar is the third most common currency."},
           bgPadding: 20,
           color: ['red'],
           x: 135,
@@ -859,7 +883,7 @@
 
       const annotations_success = [
         {
-          note: {label: "USD is the most popular currency for Kickstarter Campaigns, but here are other currencies that are also supported."},
+          note: {label: "USD is the most popular currency for unsuccessful Kickstarter Campaigns also"},
           bgPadding: 20,
           color: ['red'],
           x: 45,
@@ -871,7 +895,7 @@
           subject: {radius: 25, radiusPadding: 10},
         },
         {
-          note: {label: "But currencies outside the US and UK differ in usage amount between Successful and Unsuccessful projects. For unsuccessful projects, the Euro is the third most popular currency."},
+          note: {label: "But currencies outside the US and UK differ in usage amount between successful and unsuccessful projects. For unsuccessful projects, the Euro is the third most popular currency."},
           bgPadding: 20,
           color: ['red'],
           x: 135,
