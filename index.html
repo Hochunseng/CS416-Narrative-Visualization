@@ -32,15 +32,7 @@
 <div style="text-align:center;" id="directions">
 </div>
 
-<div style="text-align:center;" id="my_dataviz"></div>
-<div style="text-align:center;" id="randomizerTitle"></div>
-<div style="text-align:center;" id="randomizer">
-  <div id="Product Design"></div>
-  <div id="Tabletop Games"></div>
-  <div id="Shorts"></div>
-  <div id="Music"></div>
-  <div id="Documentary"></div>
-</div>
+<div style="text-align:center;" id="visualization"></div>
 
 <script src='https://d3js.org/d3.v5.min.js'></script>
 <script src='https://cdnjs.cloudflare.com/ajax/libs/d3-annotation/2.5.1/d3-annotation.min.js'></script>
@@ -57,7 +49,7 @@
             "        61% of projects raised less than half of their goal. <br> <br>" +
             "Overall, <span style=\"color: red\">64%</span> of projects were unsuccessful (either <span style=\"color: #d95f02\">failed</span>, <span style=\"color: #7570b3\">canceled</span>, or <span style=\"color: #e7298a\">suspended</span>). <br> <br> ";
 
-    document.getElementById("my_dataviz").innerHTML = "";
+    document.getElementById("visualization").innerHTML = "";
 
     document.getElementById('filter').innerHTML = "";
     document.getElementById('filterCurrency').innerHTML = "";
@@ -68,16 +60,13 @@
 
     document.getElementById("directions").appendChild(hoverDirections);
 
-    // set the dimensions and margins of the graph
     const width = 1200,
             height = 1200,
             margin = 80;
 
-    // The radius of the pieplot is half the width or half the height (smallest one). I subtract a bit of margin.
     const radius = Math.min(width, height) / 2 - margin
 
-    // append the svg object to the div called 'my_dataviz'
-    const svg = d3.select("#my_dataviz")
+    const svg = d3.select("#visualization")
             .append("svg")
             .attr("width", width)
             .attr("height", height)
@@ -91,32 +80,21 @@
             .style("font-size", "30px")
             .text("Kickstarter Project Conditions");
 
-
-    // Create dummy data
     const data = {Successful: 136755, Failed: 197719, Canceled:38779, Suspended:1846}
 
-    // var data = [{'state':'Successful', 'count':136755},
-    //     {'state':'Failed', 'count':197719},
-    //     {'state':'Canceled', 'count':38779},
-    //     {'state':'Suspended', 'count':1846}]
-
-    // set the color scale
     const color = d3.scaleOrdinal()
             .domain(["a", "b", "c", "d", "e", "f", "g", "h"])
             .range(d3.schemeDark2);
 
-    // Compute the position of each group on the pie:
     const pie = d3.pie()
-            .sort(null) // Do not sort group by size
+            .sort(null)
             .value(d => d[1])
     const data_ready = pie(Object.entries(data))
 
-    // The arc generator
     const arc = d3.arc()
-            .innerRadius(radius * 0.5)         // This is the size of the donut hole
+            .innerRadius(radius * 0.5)
             .outerRadius(radius * 0.8)
 
-    // Another arc that won't be drawn. Just for labels positioning
     const outerArc = d3.arc()
             .innerRadius(radius * 0.9)
             .outerRadius(radius * 0.9)
@@ -132,7 +110,7 @@
             .style('background', 'rgba(0,0,0,0.6)')
             .style('border-radius', '4px')
             .style('color', '#fff')
-            .text('a simple tooltip');
+            .text('placeholder');
 
     svg
             .selectAll('allSlices')
@@ -167,29 +145,8 @@
             .style("stroke-width", "2px")
             .style("opacity", 0.7)
 
-
-    // Build the pie chart: Basically, each part of the pie is a path that we build using the arc function.
-    // svg
-    //     .selectAll('allSlices')
-    //     .data(data_ready)
-    //     .join('path')
-    //     .attr('d', arc)
-    //     .attr('fill', d => color(d.data[1]))
-    //     .attr("stroke", "white")
-    //     .style("stroke-width", "2px")
-    //     .style("opacity", 0.7)
-    //     .transition().delay(function(d, i) { return i * 500; }).duration(500)
-    //     .attrTween('d', function(d) {
-    //         var i = d3.interpolate(d.startAngle+0.1, d.endAngle);
-    //         return function(t) {
-    //             d.endAngle = i(t);
-    //             return arc(d);
-    //         }
-    //     });
-
-    // Add the polylines between chart and labels:
     svg
-            .selectAll('allPolylines')
+            .selectAll('lines')
             .data(data_ready)
             .join('polyline')
             .transition().delay(function(d, i) { return i * 500; }).duration(500)
@@ -204,17 +161,15 @@
             .style("fill", "none")
             .attr("stroke-width", 1)
             .attr('points', function(d) {
-              const posA = arc.centroid(d) // line insertion in the slice
-              const posB = outerArc.centroid(d) // line break: we use the other arc generator that has been built only for that
-              const posC = outerArc.centroid(d); // Label position = almost the same as posB
-              const midangle = d.startAngle + (d.endAngle - d.startAngle) / 2 // we need the angle to see if the X position will be at the extreme right or extreme left
-              posC[0] = radius * 0.95 * (midangle < Math.PI ? 1 : -1); // multiply by 1 or -1 to put it on the right or on the left
+              const posA = arc.centroid(d)
+              const posB = outerArc.centroid(d)
+              const posC = outerArc.centroid(d);
+              const midangle = d.startAngle + (d.endAngle - d.startAngle) / 2
+              posC[0] = radius * 0.95 * (midangle < Math.PI ? 1 : -1);
               return [posA, posB, posC]
             })
-
-    // Add the polylines between chart and labels:
     svg
-            .selectAll('allLabels')
+            .selectAll('labels')
             .data(data_ready)
             .join('text')
             .transition().delay(function(d, i) { return i * 500; }).duration(500)
@@ -297,7 +252,7 @@
       document.getElementById("description").innerHTML = "You may be wondering, which project categories succeed and which end up unsuccessful? <br> <br> The <span style=\"color: #1b9e77\">36%</span> of projects that do succeed tend to be projects in " +
               "\n" +
               "<span style=\"color: #4e79a7\">Product Design</span>, <span style=\"color: #f28e2c\">Tabletop Games</span>, <span style=\"color: #e15759\">Shorts</span>, <span style=\"color: #76b7b2\">Music</span>, <span style=\"color: #59a14f\">Documentary</span> <br> <br>"
-      document.getElementById("my_dataviz").innerHTML = "";
+      document.getElementById("visualization").innerHTML = "";
 
       //Successful bar chart
 
@@ -305,8 +260,7 @@
               width = 900 - margin.left - margin.right,
               height = 800 - margin.left - margin.right;
 
-      // append the svg object to the body of the page
-      var svg = d3.select("#my_dataviz")
+      var svg = d3.select("#visualization")
               .append("svg")
               .attr("width", width + margin.left + margin.right)
               .attr("height", height + margin.top + margin.bottom)
@@ -335,7 +289,6 @@
               .text("Project Count")
               .style("font-size", "30px");
 
-      // X axis
       var x = d3.scaleBand()
               .range([0, width])
               .domain(data.map(function (d) {
@@ -350,7 +303,6 @@
               .style("text-anchor", "end")
               .style("font-size", "20px");
 
-      // Add Y axis
       var y = d3.scaleLinear()
               .domain([0, 15000])
               .range([height, 0]);
@@ -387,10 +339,9 @@
               .style('background', 'rgba(0,0,0,0.6)')
               .style('border-radius', '4px')
               .style('color', '#fff')
-              .text('a simple tooltip');
+              .text('placeholder');
 
-      // Bars
-      svg.selectAll("mybar")
+      svg.selectAll("bar")
               .data(data)
               .enter()
               .append("rect")
@@ -473,7 +424,7 @@
 
       document.getElementById("description").innerHTML = "You may be wondering, which project categories succeed and which end up unsuccessful? <br> <br>" +
               "On the other hand, the <span style=\"color: red\">64%</span> of projects that are unsuccessful (<span style=\"color: #d95f02\">failed</span>, <span style=\"color: #7570b3\">canceled</span>, <span style=\"color: #e7298a\">suspended</span>) tend to be projects in <span style=\"color: #4e79a7\">Product Design</span>, <span style=\"color: #59a14f\">Documentary</span>, <span style=\"color: #edc949\">Video Games</span>, <span style=\"color: #af7aa1\">Food</span>, and <span style=\"color: #76b7b2\">Music</span> <br> <br>"
-      document.getElementById("my_dataviz").innerHTML = "";
+      document.getElementById("visualization").innerHTML = "";
 
       //Failed, canceled, suspended bar chart
 
@@ -503,8 +454,7 @@
         }
       }
 
-      // append the svg object to the body of the page
-      var svg = d3.select("#my_dataviz")
+      var svg = d3.select("#visualization")
               .append("svg")
               .attr("width", width2 + margin2.left + margin2.right)
               .attr("height", height2 + margin2.top + margin2.bottom)
@@ -533,7 +483,6 @@
               .text("Project Count")
               .style("font-size", "30px");
 
-      // X axis
       var x2 = d3.scaleBand()
               .range([0, width2])
               .domain(data2.map(function (d) {
@@ -548,7 +497,6 @@
               .style("text-anchor", "end")
               .style("font-size", "20px");
 
-      // Add Y axis
       var y2 = d3.scaleLinear()
               .domain([0, 15000])
               .range([height2, 0]);
@@ -556,8 +504,7 @@
               .call(d3.axisLeft(y2))
               .style("font-size", "20px");
 
-      // Bars
-      svg.selectAll("mybar")
+      svg.selectAll("bar")
               .data(data2)
               .enter()
               .append("rect")
@@ -632,7 +579,7 @@
 
     document.getElementById("description").innerHTML = "What about the most popular currencies used? <br> <br> The distribution of currencies can give an idea of where in the world Kickstarter Campaigns are usually held. <br> <br> You may also want to know how long Kickstarter Campaigns tend to be. <br> <br>";
 
-    document.getElementById("my_dataviz").innerHTML = "";
+    document.getElementById("visualization").innerHTML = "";
 
     document.getElementById("directions").innerHTML = "";
 
@@ -640,41 +587,6 @@
     hoverDirections.innerHTML = "<br> Tip: You can hover your mouse over a bar in the bar chart or bar in the histogram for the exact count of the specific category/bucket"
 
     document.getElementById("directions").appendChild(hoverDirections);
-
-    // var data = await d3.csv("ks-projects-201801.csv");
-    //
-    // var product_design = data.filter(function(row) {
-    //   return row['category'] == 'Product Design'
-    // });
-    //
-    // var tabletop_games = data.filter(function(row) {
-    //   return row['category'] == 'Tabletop Games'
-    // });
-    //
-    // var shorts = data.filter(function(row) {
-    //   return row['category'] == 'Shorts'
-    // });
-    //
-    // var music = data.filter(function(row) {
-    //   return row['category'] == 'Music'
-    // });
-    //
-    // var documentary = data.filter(function(row) {
-    //   return row['category'] == 'Documentary'
-    // });
-    //
-    // function getRandomInt(max) {
-    //   return Math.floor(Math.random() * max);
-    // }
-    //
-    // var selected_product_design = product_design[getRandomInt(product_design.length - 1)];
-    // var selected_tabletop_games = tabletop_games[getRandomInt(tabletop_games.length - 1)];
-    // var selected_shorts = shorts[getRandomInt(shorts.length - 1)];
-    // var selected_music = music[getRandomInt(music.length - 1)];
-    // var selected_documentary = documentary[getRandomInt(documentary.length - 1)];
-    //
-    // document.getElementById("description").innerHTML = selected_product_design.name + selected_tabletop_games.name + selected_shorts.name + selected_music.name + selected_documentary.name;
-    // console.log(product_design.length)
 
     var data = [{'currency':'USD', 'count':111120},
       {'currency':'GBP', 'count':12360},
@@ -763,15 +675,13 @@
     document.getElementById("filter").appendChild(failedButton);
 
     function successfulBarChart() {
-      document.getElementById("my_dataviz").innerHTML = "";
+      document.getElementById("visualization").innerHTML = "";
 
-      // set the dimensions and margins of the graph
       var margin = {top: 100, right: 100, bottom: 250, left: 100},
               width = 900 - margin.left - margin.right,
               height = 800 - margin.left - margin.right;
 
-      // append the svg object to the body of the page
-      var svg = d3.select("#my_dataviz")
+      var svg = d3.select("#visualization")
               .append("svg")
               .attr("width", width + margin.left + margin.right)
               .attr("height", height + margin.top + margin.bottom)
@@ -830,7 +740,6 @@
       const showAnnotationsSuccess = d3.annotation().annotations(annotations_success);
       svg.append('g').call(showAnnotationsSuccess)
 
-      // X axis
       var x = d3.scaleBand()
               .range([0, width])
               .domain(data.map(function (d) {
@@ -844,7 +753,6 @@
               .attr("transform", "translate(-10,0)rotate(-45)")
               .style("text-anchor", "end")
 
-      // Add Y axis
       var y = d3.scaleLinear()
               .domain([0, 200000])
               .range([height, 0]);
@@ -862,10 +770,9 @@
               .style('background', 'rgba(0,0,0,0.6)')
               .style('border-radius', '4px')
               .style('color', '#fff')
-              .text('a simple tooltip');
+              .text('placeholder');
 
-      // Bars
-      svg.selectAll("mybar")
+      svg.selectAll("bar")
               .data(data)
               .enter()
               .append("rect")
@@ -915,15 +822,13 @@
     }
 
     function failedBarChart() {
-      document.getElementById("my_dataviz").innerHTML = "";
+      document.getElementById("visualization").innerHTML = "";
 
-      // set the dimensions and margins of the graph
       var margin = {top: 100, right: 100, bottom: 250, left: 100},
               width = 900 - margin.left - margin.right,
               height = 800 - margin.left - margin.right;
 
-      // append the svg object to the body of the page
-      var svg = d3.select("#my_dataviz")
+      var svg = d3.select("#visualization")
               .append("svg")
               .attr("width", width + margin.left + margin.right)
               .attr("height", height + margin.top + margin.bottom)
@@ -982,7 +887,6 @@
       const showAnnotationsSuccess = d3.annotation().annotations(annotations_success);
       svg.append('g').call(showAnnotationsSuccess)
 
-      // X axis
       var x = d3.scaleBand()
               .range([0, width])
               .domain(data2.map(function (d) {
@@ -996,7 +900,6 @@
               .attr("transform", "translate(-10,0)rotate(-45)")
               .style("text-anchor", "end")
 
-      // Add Y axis
       var y = d3.scaleLinear()
               .domain([0, 200000])
               .range([height, 0]);
@@ -1014,10 +917,9 @@
               .style('background', 'rgba(0,0,0,0.6)')
               .style('border-radius', '4px')
               .style('color', '#fff')
-              .text('a simple tooltip');
+              .text('placeholder');
 
-      // Bars
-      svg.selectAll("mybar")
+      svg.selectAll("bar")
               .data(data2)
               .enter()
               .append("rect")
@@ -1074,13 +976,11 @@
             width = 900 - margin.left - margin.right,
             height = 800 - margin.left - margin.right;
 
-    // set the dimensions and margins of the graph
     var margin2 = {top: 100, right: 100, bottom: 250, left: 200},
             width2 = 900 - margin.left - margin.right,
             height2 = 800 - margin.left - margin.right;
 
-    // append the svg object to the body of the page
-    var svg = d3.select("#my_dataviz")
+    var svg = d3.select("#visualization")
             .append("svg")
             .attr("width", width + margin2.left + margin2.right)
             .attr("height", height + margin2.top + margin2.bottom)
@@ -1109,18 +1009,14 @@
             .text("Length of Campaign (Days) Count")
             .style("font-size", "30px");
 
-    // get the data
     var data = await d3.csv("kickstarter_clean.csv");
 
 
-    // X axis: scale and draw:
     var x = d3.scaleLinear()
-            .domain([0,91])     // can use this instead of 1000 to have the max of data: d3.max(data, function(d) { return +d.price })
+            .domain([0,91])
             .range([0, width]);
     svg.append("g")
             .attr("transform", "translate(0," + height + ")")
-            // .transition()
-            // .duration(1000)
             .call(d3.axisBottom(x));
 
     const annotations = [
@@ -1153,32 +1049,24 @@
     const showAnnotations = d3.annotation().annotations(annotations);
     svg.append('g').call(showAnnotations)
 
-    // set the parameters for the histogram
     var histogram = d3.histogram()
-            .value(function(d) { return +d.Difference; })   // I need to give the vector of value
-            .domain(x.domain())  // then the domain of the graphic
-            .thresholds(x.ticks(40)); // then the numbers of bins
+            .value(function(d) { return +d.Difference; })
+            .domain(x.domain())
+            .thresholds(x.ticks(40));
 
-    // And apply twice this function to data to get the bins.
     var bins1 = histogram(data.filter( function(d){return d.state === "successful" || d.state === "live"} ));
     var bins2 = histogram(data.filter( function(d){return d.state != "successful" || d.state != "live"} ));
 
-    // Y axis: scale and draw:
     var y = d3.scaleLinear()
             .range([height, 0]);
-    y.domain([0, 200000]);   // d3.hist has to be called before the Y axis obviously
+    y.domain([0, 200000]);
     svg.append("g")
-            // .transition()
-            // .duration(1000)
             .call(d3.axisLeft(y));
 
-    // append the bars for series 1
     var rect = svg.selectAll("rect")
             .data(bins1)
             .enter()
             .append("rect")
-            // .transition()
-            // .duration(1000)
             .attr("x", 1)
             .attr("transform", function(d) { return "translate(" + x(d.x0) + "," + y(d.length) + ")"; })
             .attr("width", function(d) { return x(d.x1) - x(d.x0) -1 ; })
@@ -1203,15 +1091,10 @@
               tooltip.html(``).style('visibility', 'hidden');
             });
 
-
-
-    // append the bars for series 2
     var rect2 = svg.selectAll("rect2")
             .data(bins2)
             .enter()
             .append("rect")
-            // .transition()
-            // .duration(1000)
             .attr("x", 1)
             .attr("transform", function(d) { return "translate(" + x(d.x0) + "," + y(d.length) + ")"; })
             .attr("width", function(d) { return x(d.x1) - x(d.x0) -1 ; })
@@ -1236,98 +1119,12 @@
               tooltip.html(``).style('visibility', 'hidden');
             });
 
-    // Handmade legend
     svg.append("circle").attr("cx",550).attr("cy",30).attr("r", 6).style("fill", "#69b3a2")
     svg.append("circle").attr("cx",550).attr("cy",60).attr("r", 6).style("fill", "#404080")
     svg.append("text").attr("x", 570).attr("y", 30).text("Successful").style("font-size", "15px").attr("alignment-baseline","middle")
     svg.append("text").attr("x", 570).attr("y", 60).text("Unsuccessful").style("font-size", "15px").attr("alignment-baseline","middle")
 
 }
-    // var product_design = data.filter(function(row) {
-    //   return row['category'] == 'Product Design' && row['state'] == 'successful'
-    // });
-    //
-    // var tabletop_games = data.filter(function(row) {
-    //   return row['category'] == 'Tabletop Games' && row['state'] == 'successful'
-    // });
-    //
-    // var shorts = data.filter(function(row) {
-    //   return row['category'] == 'Shorts' && row['state'] == 'successful'
-    // });
-    //
-    // var music = data.filter(function(row) {
-    //   return row['category'] == 'Music' && row['state'] == 'successful'
-    // });
-    //
-    // var documentary = data.filter(function(row) {
-    //   return row['category'] == 'Documentary' && row['state'] == 'successful'
-    // });
-    //
-    // function getRandomInt(max) {
-    //   return Math.floor(Math.random() * max);
-    // }
-    //
-    // function randomProjects() {
-    //   var selected_product_design = product_design[getRandomInt(product_design.length - 1)];
-    //   var selected_tabletop_games = tabletop_games[getRandomInt(tabletop_games.length - 1)];
-    //   var selected_shorts = shorts[getRandomInt(shorts.length - 1)];
-    //   var selected_music = music[getRandomInt(music.length - 1)];
-    //   var selected_documentary = documentary[getRandomInt(documentary.length - 1)];
-    //
-    //   document.getElementById("Product Design").innerHTML = 'Product Design: <br>' + selected_product_design.name + '<br>'
-    //   document.getElementById("Tabletop Games").innerHTML = 'Tabletop Games: <br>' + selected_tabletop_games.name + '<br>'
-    //   document.getElementById("Shorts").innerHTML = 'Shorts: <br>' + selected_shorts.name + '<br>'
-    //   document.getElementById("Music").innerHTML = 'Music: <br>' + selected_music.name + '<br>'
-    //   document.getElementById("Documentary").innerHTML = 'Documentary: <br>' + selected_documentary.name + '<br>'
-    //
-    //   var image1 = document.createElement("img");
-    //   image1.setAttribute("src", "images/productdesign.jpg");
-    //   image1.setAttribute("height", "100");
-    //   image1.setAttribute("width", "100");
-    //   image1.setAttribute("alt", "product design");
-    //
-    //   var image2 = document.createElement("img");
-    //   image2.setAttribute("src", "images/tabletopgames.jpg");
-    //   image2.setAttribute("height", "100");
-    //   image2.setAttribute("width", "100");
-    //   image2.setAttribute("alt", "tabletop games");
-    //
-    //   var image3 = document.createElement("img");
-    //   image3.setAttribute("src", "images/shorts.jpg");
-    //   image3.setAttribute("height", "100");
-    //   image3.setAttribute("width", "100");
-    //   image3.setAttribute("alt", "shorts");
-    //
-    //   var image4 = document.createElement("img");
-    //   image4.setAttribute("src", "images/music.jpg");
-    //   image4.setAttribute("height", "100");
-    //   image4.setAttribute("width", "100");
-    //   image4.setAttribute("alt", "music");
-    //
-    //   var image5 = document.createElement("img")
-    //   image5.setAttribute("src", "images/documentary.jpg");
-    //   image5.setAttribute("height", "100");
-    //   image5.setAttribute("width", "100");
-    //   image5.setAttribute("alt", "product design");
-    //
-    //   document.getElementById("Product Design").appendChild(image1)
-    //   document.getElementById("Tabletop Games").appendChild(image2)
-    //   document.getElementById("Shorts").appendChild(image3)
-    //   document.getElementById("Music").appendChild(image4)
-    //   document.getElementById("Documentary").appendChild(image5)
-    // }
-    //
-    // randomProjects();
-    //
-    // document.getElementById("randomizerTitle").innerHTML = 'Random Successful Projects <br> <br>'
-    //
-    // var randomizerButton = document.createElement("button");
-    // randomizerButton.innerHTML = "More Random Projects";
-    // randomizerButton.onclick = function() {
-    //   randomProjects();
-    // };
-    //
-    // document.getElementById("randomizerTitle").appendChild(randomizerButton);
 
   }
 
